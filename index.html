@@ -1,0 +1,360 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>二维码生成接口</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!-- 网站图标 -->
+		<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+		<link rel="icon" href="images/favicon.png" type="image/png">
+		<!-- 使用国内CDN -->
+		<link href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+		<script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+		<script>
+			// 在页面加载时将SVG转换为PNG作为favicon
+			document.addEventListener('DOMContentLoaded', function() {
+				// 创建一个Image对象来加载SVG
+				var img = new Image();
+				img.onload = function() {
+					// 创建canvas元素
+					var canvas = document.createElement('canvas');
+					canvas.width = 32;
+					canvas.height = 32;
+					var ctx = canvas.getContext('2d');
+					
+					// 在canvas上绘制SVG
+					ctx.drawImage(img, 0, 0, 32, 32);
+					
+					// 将canvas转换为PNG数据URL
+					var pngDataUrl = canvas.toDataURL('image/png');
+					
+					// 创建新的favicon链接
+					var link = document.createElement('link');
+					link.rel = 'icon';
+					link.href = pngDataUrl;
+					link.type = 'image/png';
+					
+					// 添加到head
+					document.head.appendChild(link);
+				};
+				
+				// 加载SVG
+				img.src = 'images/favicon.svg';
+			});
+		</script>
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			
+			body {
+				background-color: #000;
+				color: #fff;
+				font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+				justify-content: center;
+				align-items: center;
+				letter-spacing: 0.5px;
+				overflow-x: hidden;
+			}
+			
+			.container {
+				width: 100%;
+				max-width: 500px;
+				padding: 0 20px;
+				margin: 0 auto;
+				position: relative;
+				z-index: 2;
+				text-align: center;
+			}
+			
+			#header {
+				margin-bottom: 30px;
+			}
+			
+			#header h1 {
+				font-size: 2.5em;
+				margin-bottom: 20px;
+				font-weight: 700;
+				color: #2dd4bf;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			}
+			
+			#header p {
+				font-size: 1.1em;
+				line-height: 1.8;
+				color: rgba(255, 255, 255, 0.9);
+				margin-bottom: 30px;
+			}
+			
+			.logo {
+				max-width: 120px;
+				margin: 0 auto 20px;
+				display: block;
+			}
+			
+			#signup-form {
+				width: 100%;
+				margin-bottom: 20px;
+			}
+			
+			#signup-form input[type="url"] {
+				background: rgba(255, 255, 255, 0.1);
+				border: solid 1px rgba(255, 255, 255, 0.3);
+				border-radius: 8px;
+				color: #fff;
+				display: block;
+				width: 100%;
+				height: 50px;
+				padding: 0 15px;
+				margin-bottom: 15px;
+				font-size: 16px;
+				transition: all 0.3s ease;
+			}
+			
+			#signup-form input[type="url"]:focus {
+				border-color: #2dd4bf;
+				box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.3);
+				outline: none;
+			}
+			
+			#signup-form input[type="button"] {
+				background-color: #2dd4bf;
+				border: 0;
+				border-radius: 8px;
+				color: #fff;
+				cursor: pointer;
+				display: block;
+				font-weight: 600;
+				height: 50px;
+				width: 100%;
+				font-size: 16px;
+				transition: all 0.3s ease;
+				letter-spacing: 1px;
+			}
+			
+			#signup-form input[type="button"]:hover {
+				background-color: #34d399;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+			
+			#status {
+				height: 24px;
+				margin: 15px 0;
+				font-size: 15px;
+				font-weight: 500;
+				color: #2dd4bf;
+			}
+			
+			#b_url {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				margin-top: 10px;
+			}
+			
+			.qrcode-container {
+				background-color: white;
+				padding: 15px;
+				border-radius: 10px;
+				display: inline-block;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+				margin-bottom: 15px;
+			}
+			
+			.download-btn {
+				background-color: #2dd4bf;
+				color: white;
+				border: none;
+				border-radius: 8px;
+				padding: 10px 25px;
+				font-size: 16px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				margin-top: 15px;
+			}
+			
+			.download-btn:hover {
+				background-color: #34d399;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+			
+			.error-message {
+				color: #f87171;
+				font-weight: 500;
+			}
+			
+			.success-message {
+				color: #2dd4bf;
+				font-weight: 500;
+			}
+			
+			/* 背景动画样式 */
+			#bg {
+				-moz-transition: opacity 2s ease-in-out;
+				-webkit-transition: opacity 2s ease-in-out;
+				-ms-transition: opacity 2s ease-in-out;
+				transition: opacity 2s ease-in-out;
+				height: 100%;
+				left: 0;
+				opacity: 0.6;
+				position: fixed;
+				top: 0;
+				width: 100%;
+				z-index: 1;
+			}
+			
+			#bg div {
+				-moz-transition: opacity 3s ease;
+				-webkit-transition: opacity 3s ease;
+				-ms-transition: opacity 3s ease;
+				transition: opacity 3s ease;
+				background-size: cover;
+				height: 100%;
+				left: 0;
+				opacity: 0;
+				position: absolute;
+				top: 0;
+				visibility: hidden;
+				width: 150%;
+			}
+			
+			#bg div.visible {
+				-moz-animation: bg 45s linear infinite;
+				-webkit-animation: bg 45s linear infinite;
+				-ms-animation: bg 45s linear infinite;
+				animation: bg 45s linear infinite;
+				opacity: 1;
+				visibility: visible;
+				z-index: 1;
+			}
+			
+			#bg div.visible.top {
+				z-index: 2;
+			}
+			
+			@keyframes bg {
+				0% {
+					-moz-transform: translateX(0);
+					-webkit-transform: translateX(0);
+					-ms-transform: translateX(0);
+					transform: translateX(0);
+				}
+				100% {
+					-moz-transform: translateX(-25%);
+					-webkit-transform: translateX(-25%);
+					-ms-transform: translateX(-25%);
+					transform: translateX(-25%);
+				}
+			}
+			
+			body.is-preload *, body.is-preload *:before, body.is-preload *:after {
+				-moz-animation: none !important;
+				-webkit-animation: none !important;
+				-ms-animation: none !important;
+				animation: none !important;
+				-moz-transition: none !important;
+				-webkit-transition: none !important;
+				-ms-transition: none !important;
+				transition: none !important;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+		<div class="container">
+			<!-- Header -->
+			<header id="header">
+				<img src="images/qrcode-logo.svg" alt="二维码生成器" class="logo">
+				<h1>二维码生成接口</h1>
+				<p>在下方输入链接，即可生成二维码<br>
+					下载生成的图片，分享到微信或者QQ即可</p>
+			</header>
+
+			<!-- Form -->
+			<form id="signup-form" method="post">
+				<input type="url" name="url" id="url" placeholder="输入网址" />
+				<input type="button" value="生成二维码" onclick="build_url()"/>
+			</form>
+			<p id="status"></p>
+			<div id="b_url"></div>
+		</div>
+
+		<!-- 背景图片动画脚本 -->
+		<script src="assets/js/main.js"></script>
+		<script>
+			// 二维码生成功能
+			function build_url(){
+				var statusElement = document.getElementById("status");
+				var resultElement = document.getElementById("b_url");
+				var url = document.querySelector('#url').value.trim();
+				
+				// 重置状态
+				statusElement.innerHTML = "";
+				resultElement.innerHTML = "";
+				
+				if (url === "" || (url.indexOf("http://") === -1 && url.indexOf("https://") === -1)){
+					statusElement.innerHTML = `<span class="error-message">输入的不是链接或者未加http/https请求头！</span>`;
+					return;
+				}
+				
+				// 显示加载状态
+				statusElement.innerHTML = `<span>正在生成二维码...</span>`;
+				
+				try {
+					// 清除之前的二维码
+					resultElement.innerHTML = "";
+					
+					// 创建二维码容器
+					var qrcodeContainer = document.createElement('div');
+					qrcodeContainer.className = 'qrcode-container';
+					resultElement.appendChild(qrcodeContainer);
+					
+					// 使用QRCode.js生成二维码
+					new QRCode(qrcodeContainer, {
+						text: url,
+						width: 200,
+						height: 200,
+						colorDark: "#000000",
+						colorLight: "#ffffff",
+						correctLevel: QRCode.CorrectLevel.H
+					});
+					
+					// 显示成功消息
+					statusElement.innerHTML = `<span class="success-message">二维码生成成功！</span>`;
+					
+					// 添加下载链接
+					setTimeout(function() {
+						var canvas = qrcodeContainer.querySelector('canvas');
+						if (canvas) {
+							var downloadLink = document.createElement('a');
+							downloadLink.href = canvas.toDataURL('image/png');
+							downloadLink.download = 'qrcode.png';
+							
+							var downloadBtn = document.createElement('button');
+							downloadBtn.className = 'download-btn';
+							downloadBtn.textContent = '下载二维码';
+							downloadLink.appendChild(downloadBtn);
+							
+							resultElement.appendChild(downloadLink);
+						}
+					}, 100);
+					
+				} catch (e) {
+					console.error(e);
+					statusElement.innerHTML = `<span class="error-message">二维码生成失败：${e.message}</span>`;
+					resultElement.innerHTML = "";
+				}
+			}
+		</script>
+	</body>
+</html>

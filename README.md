@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/covers/32-qrcode.jpg" alt="qrcode 项目封面" width="100%"></p>
+
 # 🔲 qrcode
 
 **纯前端二维码生成器，输入链接即刻生成，支持一键下载。**
